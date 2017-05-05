@@ -41,6 +41,8 @@ def finalise_extraction(outdir, dest_dir):
                 # Move the file to sql_data_files dir
                 try:
                     shutil.move(src=os.path.join(path, name), dst=dest_dir)
+                    logging.info("Removing temp directories")
+                    shutil.rmtree(path=outdir + "/home")
                 except shutil.Error as why:
                     print(str(why))
                     logging.debug(str(why))

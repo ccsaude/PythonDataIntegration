@@ -2,12 +2,19 @@ import os
 from filemanager import decompressfile
 import logging
 
-# Directories config
-basedir = "/home/agnaldo/PycharmProjects/PyDataIntegration"
+# Read config file
+with open("/home/agnaldo/config.yaml", 'r') as stream:
+    try:
+        config = yaml.load(stream)
 
-datadir = basedir + "/sql_data_files"
-outdir = basedir + "/out"
-backup_dir = basedir + "/backups"
+    except yaml.YAMLError as exc:
+        logging.debug(str(exc))
+
+basedir = config['basedir']
+outdir = basedir + config['outdir']
+backup_dir = basedir + config['backup_dir']
+datadir = basedir + config['datadir']
+
 
 # Logging
 logfile = "/pylog.log"
