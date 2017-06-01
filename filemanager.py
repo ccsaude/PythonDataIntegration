@@ -2,6 +2,21 @@ import tarfile
 import logging
 import os
 import shutil
+import sys
+
+
+def matchfacilityname(arr_facilities,f_name):
+    facility = ''
+    for f in arr_facilities:
+        # Alguns nomes nao serao encontrados na lista (config.yaml)
+        # casos em que se escreve mal o nome da US no script de backup
+        # nestes casos deve-se corrigir o nome no script de backup (ex: Malhagalene -> Malhangalene)
+        if f.lower() in f_name.lower():
+            facility = f
+            break
+        else:
+            facility = f_name.lower()[:len(f_name) - 4]  # No match found, remove .sql extension
+    return facility
 
 
 def decompressfile(filename, outdir, destdir):
@@ -14,13 +29,32 @@ def decompressfile(filename, outdir, destdir):
                     finalise_extraction(outdir, destdir)
 
         except tarfile.ReadError:
-            logging.debug("tarfile   module or is somehow  invalid/ file is opened")
+            logging.debug("File: " + member.name + " is somehow  invalid/ file is opened")
+            print("File: " + member.name + " is somehow  invalid/ file is opened")
         except tarfile.CompressionError:
-            logging.debug(" when the backups cannot be decoded properly")
+            logging.debug("File: " + member.name + " cannot be decoded properly")
+            print("File: " + member.name + " cannot be decoded properly")
         except tarfile.TarError:
-            logging.debug("IOerror: File cant be extracted")
+            logging.debug("File: " + member.name + "  cant be extracted")
+            print("File: " + member.name + "  cant be extracted")
+        except:
+            logging.debug("File: " + member.name + "Unexpected error:", sys.exc_info()[0])
+            print("File: " + member.name + "Unexpected error:", sys.exc_info()[0])
     else:
         logging.debug(filename + " is not an .tar file")
+        print(filename + " is not an .tar file")
+
+    return
+
+
+def renamebackupfiles(vector_facilities,sql_files_dir):
+    if os.path.isdir(sql_files_dir):
+        os.chdir(sql_files_dir)
+        for root, dirs, files in os.walk('.', topdown=True):
+            for f in files:
+                if f.endswith(".sql"):
+                    new_name = matchfacilityname(vector_facilities,f)
+                    os.rename(f, 'cs_' + new_name + '.sql')
 
     return
 
@@ -38,6 +72,7 @@ def finalise_extraction(outdir, dest_dir):
         for name in files:
             if name.endswith(".sql"):
                 logging.info("moving file: " + name + " to sql_data_files dir")
+                print("moving file: " + name + " to sql_data_files dir")
                 # Move the file to sql_data_files dir
                 try:
                     shutil.move(src=os.path.join(path, name), dst=dest_dir)
@@ -46,3 +81,4 @@ def finalise_extraction(outdir, dest_dir):
                 except shutil.Error as why:
                     print(str(why))
                     logging.debug(str(why))
+    return
