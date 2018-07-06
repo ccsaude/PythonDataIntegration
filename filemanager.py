@@ -25,7 +25,7 @@ def decompressfile(filename, outdir, destdir):
             t = tarfile.open(filename, 'r')
             for member in t.getmembers():
                 if os.path.splitext(member.name)[1] == ".sql":
-                    t.extract(member, outdir)
+                    t.extractall(path=outdir, members=member)
                     finalise_extraction(outdir, destdir)
 
         except tarfile.ReadError:
@@ -36,10 +36,10 @@ def decompressfile(filename, outdir, destdir):
             print("File: " + member.name + " cannot be decoded properly")
         except tarfile.TarError:
             logging.debug("File: " + member.name + "  cant be extracted")
-            print("File: " + member.name + "  cant be extracted")
+            print("File: " + member.name + "  cant be extracted " + Tar)
         except:
             logging.debug("File: " + member.name + "Unexpected error:", sys.exc_info()[0])
-            print("File: " + member.name + "Unexpected error:", sys.exc_info()[0])
+            print("File: " + member.name + " Unexpected error: ", sys.exc_info()[0])
     else:
         logging.debug(filename + " is not an .tar file")
         print(filename + " is not an .tar file")

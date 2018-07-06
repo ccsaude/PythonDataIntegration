@@ -19,7 +19,6 @@ with open("/home/agnaldo/config.yaml", 'r') as stream:
         mysql_password = config['mysql_password']
         mysqlhost = config['host']
 
-
 # Misc Functions
 def mysqlgetconnection(host, usr, pwd):
     # Connect to the database
@@ -28,7 +27,6 @@ def mysqlgetconnection(host, usr, pwd):
                                  password=pwd)
 
     return connection
-
 
 def createdatabase(conn, dbname, pathtofile):
     counter = 0
@@ -55,7 +53,6 @@ def createdatabase(conn, dbname, pathtofile):
         print("Error executing sqlquery: " + sql_create + str(err.args))
 
     return counter
-
 
 def beginmysqljob(extracted_files, sql_files_dir):
     if os.path.isdir(sql_files_dir):

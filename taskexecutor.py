@@ -4,7 +4,6 @@ import logging
 import yaml
 import dbacess
 
-
 # Read config file
 with open("/home/agnaldo/config.yaml", 'r') as stream:
     try:
@@ -16,11 +15,9 @@ with open("/home/agnaldo/config.yaml", 'r') as stream:
         basedir = config['basedir']
         outdir = basedir + config['outdir']
         backup_dir = basedir + config['backup_dir']
-        datadir = config['datadir']
+        datadir = basedir + config['datadir']
         mysql_username = config['mysql_username']
         mysql_password = config['mysql_password']
-
-
 if os.path.isdir(basedir):
 
     # log files
@@ -35,7 +32,7 @@ if os.path.isdir(basedir):
         for path, dirs, files in os.walk('.', topdown=True):
             numtarfiles = 0
             for name in files:
-                if name.endswith(".tar"):
+                if name.endswith(".gz"):
                     # Untar all backupfiles
                     numtarfiles += 1
                     logging.info("File found: " + name)
@@ -48,7 +45,7 @@ if os.path.isdir(basedir):
             facilities = config['facilities']
             filemanager.renamebackupfiles(facilities,datadir)
             dbacess.beginmysqljob(numtarfiles, datadir)
-
+        dbacess.beginmysqljob(numtarfiles, datadir)
     else:
         logging.debug("IOerror: path " + backup_dir + " was not found")
         print("IOerror: path " + backup_dir + " was not found")
